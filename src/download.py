@@ -43,7 +43,7 @@ class GCSDownloader:
 
         # Create the destination folder if it doesn't exist
         if not os.path.exists(destination_path):
-            os.makedirs(destination_path)
+            os.makedirs(destination_path, exist_ok=True)
 
         start_time = time.time()
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
