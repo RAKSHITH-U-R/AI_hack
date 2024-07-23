@@ -16,7 +16,7 @@ class GCSDownloader:
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(source_blob_name)
         blob.download_to_filename(destination_file_name)
-        print(f"Downloaded {source_blob_name} to {destination_file_name}.")
+        # print(f"Downloaded {source_blob_name} to {destination_file_name}.")
 
     def list_blobs(self, bucket_name, prefix):
         """Lists all the blobs in the bucket that begin with the prefix."""
