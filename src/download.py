@@ -13,7 +13,7 @@ class GCSDownloader:
 
     def download_blob(self, bucket_name, source_blob_name, destination_file_name):
         """Downloads a blob from the bucket."""
-        print(destination_file_name)
+        # print(destination_file_name)
         bucket = self.client.bucket(bucket_name)
         blob = bucket.blob(source_blob_name)
         blob.download_to_filename(destination_file_name)
@@ -34,7 +34,7 @@ class GCSDownloader:
 
         bucket_name = path_parts[0]
         prefix = path_parts[1] if len(path_parts) > 1 else None
-        # destination_path = os.path.join(self.destination_folder, bucket_name, (prefix if prefix else ""))
+        destination_path = os.path.join(self.destination_folder, bucket_name, (prefix if prefix else ""))
 
         blobs = self.list_blobs(bucket_name, prefix)
         total_files = sum(1 for _ in blobs)  # Get the total number of files
@@ -44,13 +44,13 @@ class GCSDownloader:
 
         # Create the destination folder if it doesn't exist
         # if not os.path.exists(destination_path):
-        #     os.makedirs(destination_path, exist_ok=True)
+        os.makedirs(destination_path, exist_ok=True)
 
         start_time = time.time()
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             future_to_blob = {
                 executor.submit(
-                    self.download_blob, bucket_name, blob.name, os.path.join(self.destination_folder, os.path.basename(blob.name))
+                    self.download_blob, bucket_name, blob.name, os.path.join(destination_path, os.path.basename(blob.name))
                 ): blob for blob in blobs
             }
 
