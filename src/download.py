@@ -33,7 +33,7 @@ class GCSDownloader:
 
         bucket_name = path_parts[0]
         prefix = path_parts[1] if len(path_parts) > 1 else None
-        destination_path = self.destination_folder+"/"+bucket_name+"/"+(prefix if prefix else "")
+        destination_path = os.path.join(self.destination_folder, bucket_name, (prefix if prefix else ""))
 
         blobs = self.list_blobs(bucket_name, prefix)
         total_files = sum(1 for _ in blobs)  # Get the total number of files
