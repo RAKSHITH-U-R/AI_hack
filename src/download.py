@@ -26,8 +26,8 @@ class GCSDownloader:
 
     def download_files_from_path(self, source_path):
         """Downloads all files from a single source path."""
-        if not source_path.startswith("gs://"):
-            raise ValueError("Source path must start with 'gs://'")
+        # if not source_path.startswith("gs://"):
+        #     raise ValueError("Source path must start with 'gs://'")
 
         path_parts = source_path[5:].split('/', 1)
 
@@ -90,10 +90,10 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='Download files from Google Cloud Storage.')
-    parser.add_argument('source_paths', type=str, nargs='+', help='The source GCS paths (e.g., gs://bucket_name/prefix)')
-    parser.add_argument('destination_folder', type=str, help='The local destination folder')
-    parser.add_argument('--service_account_key_path', type=str, default=None, help='Path to the service account key JSON file (optional, for local use)')
+    parser.add_argument('--s', type=str, nargs='+', help='The source GCS paths (e.g., gs://bucket_name/prefix)')
+    parser.add_argument('--d', type=str, default='/mnt/disks/local_disk_1', help='The local destination folder')
+    parser.add_argument('--k', type=str, default=None, help='Path to the service account key JSON file (optional, for local use)')
 
     args = parser.parse_args()
 
-    main(args.source_paths, args.destination_folder, args.service_account_key_path)
+    main(args.s, args.d, args.k)
