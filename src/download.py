@@ -5,7 +5,7 @@ import multiprocessing
 import time
 
 class GCSDownloader:
-    def __init__(self, service_account_key_path=None, max_workers=50, destination_folder="/downloads"):
+    def __init__(self, service_account_key_path=None, max_workers=25, destination_folder="/downloads"):
         if service_account_key_path:
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account_key_path
         self.client = storage.Client()
@@ -38,7 +38,7 @@ class GCSDownloader:
         print(f"Started downloading {total_files} files from {source_path}")
         start_time = time.time()
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=min(total_files, 50)) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             futures = [
                 executor.submit(
                     self.download_blob, bucket_name, blob.name, os.path.join(destination_path, os.path.basename(blob.name))
@@ -61,7 +61,7 @@ def download_files_for_path(args):
                                destination_folder=destination_folder)
     downloader.download_files_from_path(source_path)
 
-def main(source_paths, destination_folder, service_account_key_path=None, max_workers=50):
+def main(source_paths, destination_folder, service_account_key_path=None, max_workers=25):
     start_time = time.time()
 
     pool_args = [(source_path, service_account_key_path, destination_folder, max_workers) for source_path in source_paths]
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     parser.add_argument('--s', type=str, nargs='+', help='The source GCS paths (e.g., gs://bucket_name/prefix)')
     parser.add_argument('--d', type=str, default='/mnt/disks/local_disk_1/', help='The local destination folder')
     parser.add_argument('--k', type=str, default=None, help='Path to the service account key JSON file (optional, for local use)')
-    parser.add_argument('--w', type=int, default=50, help='Maximum number of workers for multithreading')
+    parser.add_argument('--w', type=int, default=25, help='Maximum number of workers for multithreading')
 
     args = parser.parse_args()
 
