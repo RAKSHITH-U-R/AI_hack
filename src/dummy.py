@@ -1,11 +1,12 @@
 import os
 from google.cloud import storage
 import concurrent.futures
-import multiprocessing
 import time
+from google.cloud.storage import Client, transfer_manager
+import multiprocessing
 
 class GCSDownloader:
-    def __init__(self, service_account_key_path=None, max_workers=50, destination_folder="/downloads"):
+    def __init__(self, service_account_key_path=None, max_workers=20, destination_folder="/downloads"):
         if service_account_key_path:
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account_key_path
         self.client = storage.Client()
@@ -16,7 +17,9 @@ class GCSDownloader:
         """Downloads a blob from the bucket."""
         bucket = self.client.bucket(bucket_name)
         blob = bucket.blob(source_blob_name)
-        blob.download_to_filename(destination_file_name)
+        transfer_manager.download_chunks_concurrently(
+            blob, destination_file_name, chunk_size=(5 * 1024 * 1024), max_workers=8
+        )
 
     def list_blobs(self, bucket_name, prefix):
         """Lists all the blobs in the bucket that begin with the prefix."""
@@ -54,19 +57,19 @@ class GCSDownloader:
         print(f"Downloaded {total_files} files from {source_path} in {end_time - start_time:.2f} seconds.")
 
 def download_files_for_path(args):
-    """Function to be used with multiprocessing to download files from a single source path."""
+    """Function to be used with concurrent.futures.ProcessPoolExecutor to download files from a single source path."""
     source_path, service_account_key_path, destination_folder, max_workers = args
     downloader = GCSDownloader(service_account_key_path=service_account_key_path,
                                max_workers=max_workers,
                                destination_folder=destination_folder)
     downloader.download_files_from_path(source_path)
 
-def main(source_paths, destination_folder, service_account_key_path=None, max_workers=50):
+def main(source_paths, destination_folder, service_account_key_path=None, max_workers=20):
     start_time = time.time()
 
     pool_args = [(source_path, service_account_key_path, destination_folder, max_workers) for source_path in source_paths]
 
-    with multiprocessing.Pool(processes=min(len(source_paths), multiprocessing.cpu_count())) as pool:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as pool:
         pool.map(download_files_for_path, pool_args)
 
     end_time = time.time()
@@ -76,11 +79,11 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='Download files from Google Cloud Storage.')
-    parser.add_argument('--s', type=str, nargs='+', help='The source GCS paths (e.g., gs://bucket_name/prefix)')
+    parser.add_argument('sources', type=str, nargs='+', help='The source GCS paths (e.g., gs://bucket_name/prefix)')
     parser.add_argument('--d', type=str, default='/mnt/disks/local_disk_1/', help='The local destination folder')
     parser.add_argument('--k', type=str, default=None, help='Path to the service account key JSON file (optional, for local use)')
-    parser.add_argument('--w', type=int, default=50, help='Maximum number of workers for multithreading')
+    parser.add_argument('--w', type=int, default=20, help='Maximum number of workers for multithreading')
 
     args = parser.parse_args()
 
-    main(args.s, args.d, args.k, args.w)
+    main(args.sources, args.d, args.k, args.w)
