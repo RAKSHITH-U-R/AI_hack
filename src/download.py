@@ -4,7 +4,7 @@ import concurrent.futures
 import time
 
 class GCSDownloader:
-    def __init__(self, service_account_key_path=None, max_workers=50, destination_folder="/downloads"):
+    def __init__(self, service_account_key_path=None, max_workers=250, destination_folder="/downloads"):
         if service_account_key_path:
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account_key_path
         self.client = storage.Client()
