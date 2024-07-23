@@ -4,7 +4,7 @@ import concurrent.futures
 import time
 
 class GCSDownloader:
-    def __init__(self, service_account_key_path=None, max_workers=250, destination_folder="/downloads"):
+    def __init__(self, service_account_key_path=None, max_workers=50, destination_folder="/downloads"):
         if service_account_key_path:
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account_key_path
         self.client = storage.Client()
@@ -27,8 +27,6 @@ class GCSDownloader:
 
     def download_files_from_path(self, source_path):
         """Downloads all files from a single source path."""
-        # if not source_path.startswith("gs://"):
-        #     raise ValueError("Source path must start with 'gs://'")
 
         path_parts = source_path[5:].split('/', 1)
 
@@ -43,7 +41,6 @@ class GCSDownloader:
         blobs = self.list_blobs(bucket_name, prefix)
 
         # Create the destination folder if it doesn't exist
-        # if not os.path.exists(destination_path):
         os.makedirs(destination_path, exist_ok=True)
         print(f"Started downloading files from {source_path}")
         start_time = time.time()
@@ -68,17 +65,21 @@ class GCSDownloader:
         """Downloads files from multiple source paths concurrently."""
         start_time = time.time()
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            futures = [
-                executor.submit(self.download_files_from_path, source_path)
-                for source_path in source_paths
-            ]
+        # with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+        #     futures = [
+        #         executor.submit(self.download_files_from_path, source_path)
+        #         for source_path in source_paths
+        #     ]
+        #
+        #     for future in concurrent.futures.as_completed(futures):
+        #         try:
+        #             future.result()
+        #         except Exception as exc:
+        #             print(f"Source path generated an exception: {exc}")
 
-            for future in concurrent.futures.as_completed(futures):
-                try:
-                    future.result()
-                except Exception as exc:
-                    print(f"Source path generated an exception: {exc}")
+        for source_path in source_paths:
+            self.download_files_from_path(source_path)
+
 
         end_time = time.time()
         print(f"Completed downloading from all sources in {end_time - start_time:.2f} seconds.")
