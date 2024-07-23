@@ -38,7 +38,7 @@ class GCSDownloader:
         print(f"Started downloading {total_files} files from {source_path}")
         start_time = time.time()
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=total_files) as executor:
             futures = [
                 executor.submit(
                     self.download_blob, bucket_name, blob.name, os.path.join(destination_path, os.path.basename(blob.name))
