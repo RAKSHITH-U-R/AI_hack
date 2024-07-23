@@ -9,19 +9,20 @@ class GCSDownloader:
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account_key_path
         self.max_workers = max_workers or cpu_count()
         self.destination_folder = destination_folder
+        self.client = storage.Client()
 
     def download_blob(self, bucket_name, source_blob_name, destination_file_name):
         """Downloads a blob from the bucket."""
-        client = storage.Client()  # Initialize client inside the worker process
-        bucket = client.bucket(bucket_name)
+        # client = storage.Client()  # Initialize client inside the worker process
+        bucket = self.client.bucket(bucket_name)
         blob = bucket.blob(source_blob_name)
         blob.download_to_filename(destination_file_name)
         # print(f"Downloaded {source_blob_name} to {destination_file_name}.")
 
     def list_blobs(self, bucket_name, prefix):
         """Lists all the blobs in the bucket that begin with the prefix."""
-        client = storage.Client()  # Initialize client inside the function
-        bucket = client.bucket(bucket_name)
+        # client = storage.Client()  # Initialize client inside the function
+        bucket = self.client.bucket(bucket_name)
         blobs = bucket.list_blobs(prefix=prefix)
         return blobs
 
