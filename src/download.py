@@ -17,7 +17,6 @@ class GCSDownloader:
         bucket = self.client.bucket(bucket_name)
         blob = bucket.blob(source_blob_name)
         blob.download_to_filename(destination_file_name)
-        # print(f"Downloaded {source_blob_name} to {destination_file_name}.")
 
     def list_blobs(self, bucket_name, prefix):
         """Lists all the blobs in the bucket that begin with the prefix."""
@@ -64,18 +63,6 @@ class GCSDownloader:
     def download_files(self, source_paths):
         """Downloads files from multiple source paths concurrently."""
         start_time = time.time()
-
-        # with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-        #     futures = [
-        #         executor.submit(self.download_files_from_path, source_path)
-        #         for source_path in source_paths
-        #     ]
-        #
-        #     for future in concurrent.futures.as_completed(futures):
-        #         try:
-        #             future.result()
-        #         except Exception as exc:
-        #             print(f"Source path generated an exception: {exc}")
 
         for source_path in source_paths:
             self.download_files_from_path(source_path)
