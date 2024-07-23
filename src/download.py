@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Download files from Google Cloud Storage.')
     parser.add_argument('--s', type=str, nargs='+', help='The source GCS paths (e.g., gs://bucket_name/prefix)')
-    parser.add_argument('--d', type=str, default='/mnt/disks/local_disk_1', help='The local destination folder')
+    parser.add_argument('--d', type=str, default='/mnt/disks/local_disk_1/', help='The local destination folder')
     parser.add_argument('--k', type=str, default=None, help='Path to the service account key JSON file (optional, for local use)')
 
     args = parser.parse_args()
