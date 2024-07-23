@@ -66,7 +66,7 @@ def main(source_paths, destination_folder, service_account_key_path=None, max_wo
 
     pool_args = [(source_path, service_account_key_path, destination_folder, max_workers) for source_path in source_paths]
 
-    with multiprocessing.Pool(processes=min(len(source_paths), multiprocessing.cpu_count())) as pool:
+    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
         pool.map(download_files_for_path, pool_args)
 
     end_time = time.time()
