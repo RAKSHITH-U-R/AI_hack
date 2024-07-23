@@ -17,10 +17,10 @@ class GCSDownloader:
         """Downloads a blob from the bucket."""
         bucket = self.client.bucket(bucket_name)
         blob = bucket.get_blob(source_blob_name)
-        # chunk_size = blob.size if blob.size <
-        print(blob.size)
+        chunk_size = blob.size if blob.size < 10485760 else 10485760//2
+        # print(blob.size)
         transfer_manager.download_chunks_concurrently(
-            blob, destination_file_name, chunk_size=(35 * 1024 * 1024), max_workers=5
+            blob, destination_file_name, chunk_size=chunk_size, max_workers=5
         )
 
     def list_blobs(self, bucket_name, prefix):
