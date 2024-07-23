@@ -20,7 +20,7 @@ class GCSDownloader:
         # chunk_size = blob.size if blob.size <
         # print(blob.size)
         transfer_manager.download_chunks_concurrently(
-            blob, destination_file_name, chunk_size=(35 * 1024 * 1024), max_workers=5
+            blob, destination_file_name, chunk_size=min((35 * 1024 * 1024), blob.size), max_workers=5
         )
 
     def list_blobs(self, bucket_name, prefix):
