@@ -13,6 +13,7 @@ class GCSDownloader:
 
     def download_blob(self, bucket_name, source_blob_name, destination_file_name):
         """Downloads a blob from the bucket."""
+        print(destination_file_name)
         bucket = self.client.bucket(bucket_name)
         blob = bucket.blob(source_blob_name)
         blob.download_to_filename(destination_file_name)
