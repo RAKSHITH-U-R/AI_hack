@@ -16,7 +16,9 @@ class GCSDownloader:
     def download_blob(self, bucket_name, source_blob_name, destination_file_name):
         """Downloads a blob from the bucket."""
         bucket = self.client.bucket(bucket_name)
-        blob = bucket.blob(source_blob_name)
+        blob = bucket.get_blob(source_blob_name)
+        # chunk_size = blob.size if blob.size <
+        print(blob.size)
         transfer_manager.download_chunks_concurrently(
             blob, destination_file_name, chunk_size=(35 * 1024 * 1024), max_workers=5
         )
